@@ -1,39 +1,39 @@
-'use strict';
+// 'use strict';
 
-const mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
-const { MONGODB_URI } = require('../config');
+// const mongoose = require('mongoose');
+// mongoose.Promise = global.Promise;
+// const { MONGODB_URI } = require('../config');
 
-const { Note } = require('../models/notes');
+// const { Note } = require('../models/notes');
 
-mongoose.connect(MONGODB_URI)
-  .then(() => {
-    const searchTerm = 'cats';
-    let filter = {};
+// mongoose.connect(MONGODB_URI)
+//   .then(() => {
+//     const searchTerm = 'cats';
+//     let filter = {};
 
-    if (searchTerm) {
-      const re = new RegExp(searchTerm, 'i');
-      filter.title = { $regex: re };
-      filter.content = { $regex: re };
-    }
+//     if (searchTerm) {
+//       const re = new RegExp(searchTerm, 'i');
+//       filter.title = { $regex: re };
+//       filter.content = { $regex: re };
+//     }
 
-    return Note.find({ $or: [{title: filter.title}, {content: filter.content}]})
-      .sort('created')
-      .then(results => {
-        console.log(JSON.stringify(results, null, ' '));
-      })
-      .catch(console.error);
-  })
-  .then(() => {
-    return mongoose.disconnect()
-      .then(() => {
-        console.info('Disconnected');
-      });
-  })
-  .catch(err => {
-    console.error(`ERROR: ${err.message}`);
-    console.error(err);
-  });
+//     return Note.find({ $or: [{title: filter.title}, {content: filter.content}]})
+//       .sort('created')
+//       .then(results => {
+//         console.log(JSON.stringify(results, null, ' '));
+//       })
+//       .catch(console.error);
+//   })
+//   .then(() => {
+//     return mongoose.disconnect()
+//       .then(() => {
+//         console.info('Disconnected');
+//       });
+//   })
+//   .catch(err => {
+//     console.error(`ERROR: ${err.message}`);
+//     console.error(err);
+//   });
 
 // Get notes by ID
 // mongoose.connect(MONGODB_URI)

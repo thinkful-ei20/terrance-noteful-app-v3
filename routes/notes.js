@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 
 const mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
 
 const { Note } = require('../models/note');
 
@@ -46,7 +45,7 @@ router.post('/', (req, res, next) => {
   const { title, content } = req.body;
 
   if (!title) {
-    const err = new Error('Missing `title` in the request body');
+    const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
@@ -58,7 +57,7 @@ router.post('/', (req, res, next) => {
 
   Note.create(newItem)
     .then(result => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(newItem);
+      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => next(err));
 });

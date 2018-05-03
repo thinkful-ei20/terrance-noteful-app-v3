@@ -35,7 +35,7 @@ describe('Noteful App', function() {
     return mongoose.connection.db.dropDatabase();
   });
 
-  describe.only('GET /api/folders', function() {
+  describe('GET /api/folders', function() {
     it('should return all folders', function() {
       let count;
 
@@ -115,9 +115,9 @@ describe('Noteful App', function() {
 
   describe('GET /api/folders/:id', function() {
     it('should return correct folders', function() {
-      const id = '000000000000000000000000';
+      const id = '111111111111111111111103';
       let result;
-      return Note.findById(id)
+      return Folder.findById(id)
         .then(_result => {
           result = _result;
           return chai.request(app).get(`/api/folders/${id}`);
@@ -128,13 +128,12 @@ describe('Noteful App', function() {
           expect(res.body).to.be.an('object');
           expect(res.body).to.include.keys(
             'id',
-            'title',
-            'content',
+            'name',
             'createdAt',
             'updatedAt'
           );
           expect(res.body.id).to.equal(result.id);
-          expect(res.body.title).to.equal(result.title);
+          expect(res.body.name).to.equal(result.name);
         });
     });
 
@@ -152,12 +151,10 @@ describe('Noteful App', function() {
     });
   });
 
-  describe('POST /api/folders', function() {
+  describe.only('POST /api/folders', function() {
     it('should create and return a new item when provided valid data', function() {
       const newItem = {
-        title: 'The best article about cats ever!',
-        content:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
+        name: 'This is a new name getting insert'
       };
 
       let res;
@@ -175,23 +172,21 @@ describe('Noteful App', function() {
             expect(res.body).to.be.a('object');
             expect(res.body).to.have.keys(
               'id',
-              'title',
-              'content',
+              'name',
               'createdAt',
               'updatedAt'
             );
             // 2) then call the database
-            return Note.findById(res.body.id);
+            return Folder.findById(res.body.id);
           })
           // 3) then compare the API response to the database results
           .then(data => {
-            expect(res.body.title).to.equal(data.title);
-            expect(res.body.content).to.equal(data.content);
+            expect(res.body.name).to.equal(data.name);
           })
       );
     });
 
-    it('should return an error when missing "title" field', function() {
+    it('should return an error when missing "name" field', function() {
       const newItem = {
         foo: 'bar'
       };
@@ -204,7 +199,7 @@ describe('Noteful App', function() {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body.message).to.equal('Missing `title` in request body');
+          expect(res.body.message).to.equal('Missing `name` in request body');
           return Note.create(newItem).catch(err => {
             return err;
           });

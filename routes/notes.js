@@ -7,11 +7,9 @@ const mongoose = require('mongoose');
 
 const { Note } = require('../models/note');
 
-
 /* ========== GET/READ ALL ITEM ========== */
 router.get('/', (req, res, next) => {
-
-  const searchTerm = req.query.searchTerm;
+  const { searchTerm, folderId } = req.query;
   let filter = {};
 
   if (searchTerm) {
@@ -19,8 +17,12 @@ router.get('/', (req, res, next) => {
     filter.title = { $regex: re };
   }
 
+  if (folderId) {
+    filter.folderId = folderId;
+  }
+
   Note.find(filter)
-    .sort('created')
+    .sort('updatedAt')
     .then(results => {
       res.json(results);
     })
@@ -29,7 +31,6 @@ router.get('/', (req, res, next) => {
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
-
   const id = req.params.id;
 
   Note.findById(id)
@@ -41,8 +42,7 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-
-  const { title, content } = req.body;
+  const { title, content, folderId } = req.body;
 
   if (!title) {
     const err = new Error('Missing `title` in request body');
@@ -55,25 +55,35 @@ router.post('/', (req, res, next) => {
     content
   };
 
+  if (mongoose.Types.ObjectId.isValid(folderId)) {
+    newItem.folderId = folderId;
+  }
+
   Note.create(newItem)
     .then(result => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      res
+        .location(`${req.originalUrl}/${result.id}`)
+        .status(201)
+        .json(result);
     })
     .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-
-  const id = req.params.id;
+  const { id, folderId } = req.params;
   const updateObj = {};
-  const updateableFields = ['title', 'content'];
+  const updateableFields = ['title', 'content', 'folderId'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
       updateObj[field] = req.body[field];
     }
   });
+
+  if (mongoose.Types.ObjectId.isValid(folderId)) {
+    updateObj.folderId = folderId;
+  }
 
   if (!updateObj.title) {
     const err = new Error('Missing `title` in request body');
@@ -90,7 +100,6 @@ router.put('/:id', (req, res, next) => {
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
-
   const id = req.params.id;
 
   Note.findByIdAndRemove(id)

@@ -67,6 +67,7 @@ describe('Noteful App', function() {
           for (let i = 0; i < data.length; i++) {
             expect(res.body[i].id).to.equal(data[i].id);
             expect(res.body[i].title).to.equal(data[i].title);
+            expect(res.body[i].content).to.equal(data[i].content);
           }
         });
     });
@@ -128,7 +129,8 @@ describe('Noteful App', function() {
             'title',
             'content',
             'createdAt',
-            'updatedAt'
+            'updatedAt',
+            'folderId'
           );
           expect(res.body.id).to.equal(result.id);
           expect(res.body.title).to.equal(result.title);

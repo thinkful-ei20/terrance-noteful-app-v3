@@ -9,6 +9,7 @@ const { TEST_MONGODB_URI } = require('../config');
 
 const { Note } = require('../models/note');
 const seedNotes = require('../db/seed/notes');
+const seedFolders = require('../db/seed/folders');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -25,7 +26,11 @@ describe('Noteful App', function() {
   });
 
   beforeEach(function() {
-    return Note.insertMany(seedNotes).then(() => Note.createIndexes());
+    return Note.insertMany(seedNotes)
+      .then(() => {
+        Note.insertMany(seedFolders);
+      })
+      .then(() => Note.createIndexes());
   });
 
   afterEach(function() {

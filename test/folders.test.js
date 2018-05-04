@@ -151,7 +151,7 @@ describe('Noteful App', function() {
     });
   });
 
-  describe.only('POST /api/folders', function() {
+  describe('POST /api/folders', function() {
     it('should create and return a new item when provided valid data', function() {
       const newItem = {
         name: 'This is a new name getting insert'

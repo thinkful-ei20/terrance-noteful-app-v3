@@ -208,31 +208,28 @@ describe('Noteful App', function() {
   });
 
   describe('PUT /api/folders/:id', function() {
-    it('should update the note', function() {
-      let id = '000000000000000000000000';
+    it('should update the folder', function() {
       const updateItem = {
-        title: 'What about dogs?!',
-        content: 'woof woof'
+        name: 'Updated Name'
       };
-      let body;
-      return chai
-        .request(app)
-        .put(`/api/folders/${id}`)
-        .send(updateItem)
-        .then(res => {
-          body = res.body;
+      let data;
+      return Folder.findOne()
+        .select('id name')
+        .then(_data => {
+          data = _data;
+          return chai
+            .request(app)
+            .put(`/api/folders/${data.id}`)
+            .send(updateItem);
+        })
+        .then(function(res) {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.include.keys('id', 'title', 'content');
-          expect(res.body.id).to.equal(id);
-          expect(res.body.title).to.equal(updateItem.title);
-          expect(res.body.content).to.equal(updateItem.content);
-          return Note.findByIdAndUpdate(id, updateItem, { new: true });
-        })
-        .then(res => {
-          expect(res.title).to.equal(body.title);
-          expect(res.content).to.equal(body.content);
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('id', 'name');
+
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(updateItem.name);
         });
     });
 

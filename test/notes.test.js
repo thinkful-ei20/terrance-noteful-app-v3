@@ -181,6 +181,7 @@ describe('Noteful App', function() {
               'id',
               'title',
               'content',
+              'tags',
               'createdAt',
               'updatedAt'
             );

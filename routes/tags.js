@@ -65,14 +65,61 @@ router.post('/', (req, res, next) => {
         err = new Error('Tag `name` already exists');
         err.status = 400;
       }
-      return next(err);
+      next(err);
     });
 });
 
 // update a single tag
-router.put('/:id', (req, res, next) => {});
+router.put('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  if (!name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  const updateTag = { name };
+
+  Tag.findByIdAndUpdate(id, updateTag, { new: true })
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      if (err.code === 11000) {
+        err = new Error('Tag name already exists');
+        err.status = 400;
+      }
+      next(err);
+    });
+});
 
 // delete a single tag
+router.delete('/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  Tag.findByIdAndRemove(id)
+    .then(() => {
+      Note.remove({ tags: id }, function(err) {
+        if (err) return next(err);
+      });
+    })
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch(err => next(err));
+});
 
 // export tags
 module.exports = router;

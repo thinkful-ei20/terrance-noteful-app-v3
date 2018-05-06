@@ -114,7 +114,7 @@ router.delete('/:id', (req, res, next) => {
 
   Folder.findByIdAndRemove(id)
     .then(() => {
-      Note.remove({ folder: id }, function(err) {
+      Note.remove({ folderId: id }, function(err) {
         if (err) return next(err);
       });
     })
